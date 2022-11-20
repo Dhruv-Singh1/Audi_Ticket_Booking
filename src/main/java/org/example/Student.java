@@ -136,33 +136,31 @@ public class Student  implements  BaseUser ,Serializable{
         return registeredEvents;
     }
 
-    public boolean login(){
+    public  boolean login(){
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter your Email");
         String email= sc.next();
         System.out.println("Enter your Password");
         String password=sc.next();
+        int f=0;
         for (Student student:
              students) {
-            if(student.getEmail()==email){
-                System.out.println(
-                        "Student found in database"
-                );
-
-                if(student.getPassword()==password){
+            if (student.getEmail() == email) {
+                System.out.println("Student found in database\nChecking credentials...");
+                if (student.getPassword() == password) {
                     System.out.println("Login Successful ");
-
-                }
-                else{
-                    System.out.println(
-                            "Invalid Password Try Again!!"
-                    );
+                    return true;
+                    //call user home page
+                } else {
+                    System.out.println("Invalid Password Try Again!!");
+                    f = 1;
                 }
             }
         }
-
-        return true;
-
+            if(f==0){
+                System.out.println("Email ID not found in database please login again...");
+            }
+        return false;
     }
 
     public boolean signup(){
@@ -174,7 +172,6 @@ public class Student  implements  BaseUser ,Serializable{
        // int section = Integer.parseInt(S_section);
         Student student = new Student(name,bitsID,email,password);
         students.add(student);
-
     return true;
     }
 
