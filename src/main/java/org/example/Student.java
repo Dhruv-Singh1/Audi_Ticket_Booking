@@ -7,13 +7,13 @@ import java.util.Scanner;
 
 public class Student  implements  BaseUser ,Serializable{
     private String name;
-
     private String bitsID;
     private String email;
     private String password;
+    private ArrayList<Event> registeredEvents;
+    private static ArrayList<Student> students;
     double SWDCharges;
-    ArrayList<Student> students;
-    ArrayList<Event> registeredEvents;
+    static final long serialVersionUID = 38L;
 
     public String getName() {
         return name;
@@ -59,26 +59,33 @@ public class Student  implements  BaseUser ,Serializable{
     }
 //constructor block to read students from file
     {
+    
+        students = new ArrayList<>();
+        
+        String filename=  "/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/student.ser";
         try {
-            String filename=  "../../storagefiles/student.bin";
             ObjectInputStream is = new ObjectInputStream(new FileInputStream(filename));
-            readObject(is);
-
+            students= (ArrayList<Student>)is.readObject();          
            // ArrayList<Student> s = (ArrayList<Student>) is.readObject();
             is.close();
         }
         catch(FileNotFoundException e){
-            // System.out.println("");
-            e.printStackTrace();
+            // System.out.println("");            
         }
         catch(IOException e){
-            e.printStackTrace();
+           
+                   
         }
         catch(ClassNotFoundException e){
             e.printStackTrace();
         }
     };
 
+    Student(){
+        this.name=null;
+        this.email=null;
+        this.password=null;
+    }
     Student(String name, String bitsID, String email, String password){
         if(name!=null){
             this.name  =name;
@@ -99,10 +106,12 @@ public class Student  implements  BaseUser ,Serializable{
     @Serial
     private void writeObject(ObjectOutputStream oos)
             throws IOException {
+       
         oos.defaultWriteObject();
         // How many students we're tracking.
         oos.writeInt(students.size());
-        for (Student student : students) {
+       
+       for (Student student : students) {
             oos.writeObject(student);
         }
         System.out.println("session serialized");
@@ -112,14 +121,14 @@ public class Student  implements  BaseUser ,Serializable{
     @Serial
     private void readObject(ObjectInputStream ois)
             throws IOException, ClassNotFoundException {
+              
         ois.defaultReadObject();
         // how many Students to read.
         int size = ois.readInt();
         for (int i = 0; i < size; i++) {
             Student s = (Student) ois.readObject();
             students.add(s);
-        }
-        System.out.println("session deserialized");
+        } System.out.println("\nsession deserialized");
     }
 
     void clearOldEvents(){
@@ -135,20 +144,29 @@ public class Student  implements  BaseUser ,Serializable{
     public ArrayList<Event> viewRegisteredEvents(){
         return registeredEvents;
     }
-
+    
+    public static Student getLoginObj(){
+        return new Student();
+    }
+    
+    @Override
     public  boolean login(){
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter your Email");
         String email= sc.next();
-        System.out.println("Enter your Password");
-        String password=sc.next();
+       
         int f=0;
         for (Student student:
              students) {
-            if (student.getEmail() == email) {
-                System.out.println("Student found in database\nChecking credentials...");
-                if (student.getPassword() == password) {
+            if (student.getEmail().equalsIgnoreCase(email) ) {
+                System.out.println("Student found in database");
+                System.out.println("Enter your Password");
+                String password=sc.next();
+                System.out.println("\nChecking credentials...");
+                if (student.getPassword().equals(password)) {
                     System.out.println("Login Successful ");
+                    
+                    student.studentHomePage();
                     return true;
                     //call user home page
                 } else {
@@ -163,23 +181,52 @@ public class Student  implements  BaseUser ,Serializable{
         return false;
     }
 
+    
     public boolean signup(){
         Scanner sc = new Scanner(System.in);
-        System.out.println("Enter your Email");
-        String email= sc.next();
+        System.out.print("Enter your Name:  ");
+        String name= sc.nextLine();
+        System.out.println();
+        System.out.print("Enter your Email:  ");
+        String email= sc.nextLine();
+        System.out.println();
         System.out.println("Enter your Password");
-        String password=sc.next();
-       // int section = Integer.parseInt(S_section);
+        String password="";
+        
+        Console cnsl= System.console();
+  
+        if (cnsl == null) {
+           // System.out.println( "\t\t\tNo console available");
+            password = sc.nextLine();
+            System.out.println();
+        }
+        else{
+              // Read password
+        // into character array
+        char[] ch = cnsl.readPassword( "Enter password : ");
+         password= new String(ch);
+         System.out.println();
+        
+        }
+        System.out.print("Enter your BITS ID:   ");
+        String bitsID= sc.nextLine();
+        System.out.println("\n");
         Student student = new Student(name,bitsID,email,password);
         students.add(student);
-    return true;
+        System.out.print("Account Created Successfully"+student);
+        System.out.println("\n");
+        student.studentHomePage();
+        return true;
     }
+    
+    
 
     public boolean logout(){
-        String filename=  "../../storagefiles/student.bin";
+        String filename=  "/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/student.ser";
         try {
             ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(filename));
-
+            os.writeObject(students);
+            os.flush();
             os.close();
         }
         catch(FileNotFoundException e){
@@ -193,31 +240,70 @@ public class Student  implements  BaseUser ,Serializable{
         return true;
 
     }
-
+    
+    public void studentHomePage(){
+        System.out.println("Hii "+this.getName());
+        System.out.println("Enter 1. to see upcoming Event List");
+        System.out.println("Enter 2. to book Ticket");
+        System.out.println("Enter 3. to cancel booked Tickets");
+        System.out.println("Enter 4. to  see your registered events");
+        System.out.println("Enter 5. to Login to different Account");
+        System.out.println("Enter 6. to SignUp to a new Accounts");
+        System.out.println("Enter 7. to Logout");
+        Scanner sc = new Scanner(System.in);
+        int no = Integer.parseInt(sc.next());
+        switch(no){
+            case 1:
+                this.printEvents();
+                break;
+            case 2:
+                this.bookTicketMenu();
+                break;
+            case 3:
+                this.bookTicketMenu();
+                break;
+            case 4:
+                printEvents();
+                break;
+            case 5:
+                this.login();
+                break;
+            case 6:
+                this.signup();
+                break;
+            case 7:
+                this.logout();
+                break;
+            default:
+        }
+    }
+    
+    
+ 
+    
+    
     public void bookTicketMenu(){
         System.out.println("Following are the upcoming events in the Auditorium:");
-
-        int i=1;
-        for (Event e:Audi.getAudiObj().getEvents()
-        ) {
-            System.out.println(i+". "+e.toString()); i++;
-        }
+        this.printEvents();
         System.out.println("\n\nEnter the event number you want to register for ");
         Scanner sc = new Scanner(System.in);
         int eno = Integer.parseInt(sc.next());
         bookTicket(Audi.getAudiObj().getEvents().get(eno-1));
 
     }
+    
 
-    synchronized  public  boolean bookTicket(Event event){
+    synchronized  private  boolean bookTicket(Event event){
         //display audi seats
-        for (int s = 0; s < event.getBookedSeats().length; s++) {
-            for (int r = 0; r < event.getBookedSeats()[0].length; r++) {
-                for (int c = 0; c < event.getBookedSeats()[0][0].length; c++) {
-                    System.out.println(" ");
-                }
-            }
-        }
+//        for (int s = 0; s < event.getBookedSeats().length; s++) {
+//            for (int r = 0; r < event.getBookedSeats()[0].length; r++) {
+//                for (int c = 0; c < event.getBookedSeats()[0][0].length; c++) {
+//                    System.out.println(" ");
+//                }
+//            }
+//        }
+
+        event.printSeats();
         System.out.println();
         System.out.println("Select Seats: ");
         //take seats input

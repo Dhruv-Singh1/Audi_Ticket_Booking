@@ -1,40 +1,91 @@
 package org.example;
-
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.Serializable;
+import java.text.ParseException;
 import org.jetbrains.annotations.NotNull;
-
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Scanner;
+import java.util.*;
 
-public class Event implements Comparable<Event> {
+public class Event implements Comparable<Event>, Serializable {
 
     private String organizer;
     private String title;
     private String eventDetails;
-    private double ticketPrice;
-    private Date datetime; // calendar class
-    private Date endtime;
+    private double ticketPriceNormal;
+    private double ticketPricePremium;
+    private Date startTime; // calendar class
+    private Date endTime;
     private boolean [][][] bookedSeats;
-
     private Audi audi = Audi.getAudiObj();
     private  double netRevenue;
-    private int seatno []=new int[audi.getTotalSeats()];
-     ArrayList<Student> registeredForEvent;
+    private int seatno []=new int[Audi.getTotalSeats()];
+    ArrayList<Student> registeredForEvent;
+    static final long serialVersionUID = 40L;
 
+    
+    @Override
+    public String toString() {
+       //  Period p =Period.between(startTime,endTime);
+       long diff=(endTime.getTime()-startTime.getTime())/60000;
+       SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy hh:mm");
+            
+            
+        return
+                "\n\t" + title  +
+                "\t   by: " + organizer + 
+                "\n Event Details: \t" + eventDetails  +
+                "\n Price of Normal Seats: \t" + ticketPriceNormal +
+                "\n Price of Premium Seats: \t" + ticketPricePremium +
+                "\n Start Time: \t\t\t" + 
+                format.format(startTime)  +
+                "\n Event Duration: \t\t" + 
+                
+              diff/60+" hrs  "+
+              diff%60+" mins"         
+                
+                +"\n Net Revenue of Event: \t\t" + netRevenue +"Rs\n\n"
+             //   "\n Booked Seats:  " + Arrays.toString(bookedSeats)
+                
+                 ;
+    }
+
+    
     // is Booked on date / time ?
     // book method
     private GregorianCalendar c = new GregorianCalendar();
     void get_time(){
         c.getTime();
     }
+    
+        public void printSeats(){
+            int i=1; char c='N';
+         for (boolean[][] flr : bookedSeats) {
+            for (boolean[] row: flr) {
+                for(boolean seat: row) {
+                    
+                    String txt= (seat)?"BookD":"Avail";
+                    if(i%Audi.getAudiObj().getSeatrows()-1 >=Audi.getAudiObj().getSeatcolumns()/3&& 
+                            i%Audi.getAudiObj().getSeatrows()-1 <= 2*Audi.getAudiObj().getSeatcolumns()/3){
+                        c='P';
+                         System.out.printf(" \033[0;1m"+c + "%03d %-6s ",i++,txt);
+                    }
+                    else{
+                        c='N';
+                    System.out.printf(" "+c + "%03d %-6s ",i++,txt);
+                    }
+                }System.out.println();
+            } System.out.println("\n\n\n"); 
+        }   System.out.println("Seat Number starting 'P' are Premium seats and 'N' are Normal seats...");
+    }
+    
+    
     Event(){
         this.eventDetails=null;
         this.organizer=null;
         this.registeredForEvent=new ArrayList<>();
         this.title=null;
-        this.ticketPrice=0.00;
+        this.ticketPriceNormal=0.00;
         this.netRevenue=0.00;
         this.bookedSeats = Audi.getAudiObj().getseatsMatrix();
         for (int i=0;i< seatno.length;i++){
@@ -66,20 +117,27 @@ public class Event implements Comparable<Event> {
         this.eventDetails = eventDetails;
     }
 
-    public double getTicketPrice() {
-        return ticketPrice;
+    public double getTicketPriceNormal() {
+        return ticketPriceNormal;
     }
 
     public void setTicketPrice(double ticketPrice) {
-        this.ticketPrice = ticketPrice;
+        this.ticketPriceNormal = ticketPrice;
+    }
+      public double getTicketPricePremium() {
+        return ticketPriceNormal;
     }
 
-    public  Date getdatetime() {
-        return datetime;
+    public void setTicketPricePremium(double ticketPrice) {
+        this.ticketPricePremium = ticketPrice;
     }
 
-    public  void setdatetime(Date datetime) {
-        this.datetime = datetime;
+    public  Date getstartTime() {
+        return startTime;
+    }
+
+    public  void setstartTime(Date datetime) {
+        this.startTime = datetime;
     }
 
     public boolean[][][] getBookedSeats() {
@@ -122,15 +180,20 @@ public class Event implements Comparable<Event> {
         this.c = c;
     }
 
-    Event(String organizer, String title, String eventDetails, float ticketPrice, Date datetime){
+    
+    Event( String title,String organizer, String eventDetails, double ticketPriceNormal,double ticketPricePremium, Date datetime,Date endtime){
         this.eventDetails=eventDetails;
         this.organizer=organizer;
         this.registeredForEvent=new ArrayList<>();
         this.title=title;
-        this.ticketPrice=ticketPrice;
-        //or create the object of Date here
-        this.datetime=datetime;
+        this.ticketPriceNormal=ticketPriceNormal;
+        this.ticketPricePremium=ticketPricePremium;
+        this.startTime=datetime;
+        this.endTime=endtime;
         this.bookedSeats = Audi.getAudiObj().getseatsMatrix();
+        for (int i=0;i< seatno.length;i++){
+            seatno[i]=i+1;
+        }
         this.netRevenue=0.00;
     }
 
@@ -141,43 +204,89 @@ public class Event implements Comparable<Event> {
 
     @Override
     public int compareTo(@NotNull Event event){
-        return this.getdatetime().compareTo(event.getdatetime());
+        return this.getstartTime().compareTo(event.getstartTime());
     }
 
-    public boolean addEvent(){
-        System.out.println("Enter the Title");
+    
+    public static Event addEvent(){
+       
         try {
-            Scanner sc = new Scanner(System.in);
-            System.out.println("Enter the Event date and time in this format dd-MMM-yyyy hh:mm   Eg: 17-Jul-2022 18:35");
-            String start;
-            String time = "17-Jul-2022 18:35";
+           
+            File file = new File("/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/events.txt");
+             try{
+            Scanner fileSc = new Scanner(file);
+             }
+             
+             catch (FileNotFoundException ex) {
+            System.out.println("Error!! Input text file not found");;
+             }
+                
+             Scanner sc = new Scanner(System.in);
+            System.out.print("Enter the name of Event:\t");
+            String title;
+//            if (fileSc.hasNextLine())
+//                title= fileSc.nextLine();
+            title= sc.nextLine();
+            System.out.println();
+             
+            System.out.print("Enter the name of Organizer:\t");
+            String organizer= sc.nextLine();
+            System.out.println();
+            
+            System.out.print("Enter the Event date and time in this format dd-MMM-yyyy hh:mm   Eg: 17-Jul-2022 18:35:   ");
+            String startTime= sc.nextLine();
+            
+           
+         
             SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy hh:mm");
-            Date date = format.parse(time);
-            System.out.println(date);
-            System.out.println("Enter the ticket price:");
-            double price = Double.parseDouble(sc.next());
-            System.out.println("Enter the event details: ");
-            String details= sc.next();
+            System.out.print("\t");
+            Date startDate = format.parse(startTime);
+            Calendar c = Calendar.getInstance();
+            c.setTime(startDate);         
+            System.out.println();
+            
+            System.out.print("Enter the duration in this format hh:mm   ");
+            String duration= sc.nextLine();
+            String[] dr= duration.split(":");
+            System.out.println();
+            
+            Date endTime = new Date(c.getTimeInMillis()+1000*60*(Integer.parseInt(dr[0])*60 + Integer.parseInt(dr[1])) );
+            
+            System.out.print("Enter the price of normal seats:\t");
+            double pricen = Double.parseDouble(sc.next());
+             System.out.println();
+             
+             System.out.print("Enter the price of premium seats:\t");
+             double pricep = Double.parseDouble(sc.next());
+             System.out.println();
+             sc.nextLine();
+            System.out.print("Enter the event details:\t");
+            String details= sc.nextLine();
+
+             return new Event(title,organizer,details,pricen,pricep,startDate,endTime);
 
 
-
-
-        } catch (Exception e) { //ParseException for date
+        }  
+           catch(ParseException e ){
+               System.out.println("Invalid date format unable to parse...");
+           }catch (Exception e) { //ParseException for date
             e.printStackTrace();
         }
 
-        return false;
+        return null;
     }
 
 
+    
+    
+    
     class RegisteredStudents extends Event {
+        
 
-
-    //    private static final long serialVersionUID = 1L;
         public void addStudent(Student usr,int seatcount) {
 
             registeredForEvent.add(usr);
-            netRevenue+=ticketPrice* seatcount;
+         //   netRevenue+=  //which seat typt  x* seatcount;
 
 
         }
@@ -189,9 +298,5 @@ public class Event implements Comparable<Event> {
 
 
     }
-
-
-
-
 
 }

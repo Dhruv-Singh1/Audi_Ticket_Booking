@@ -1,15 +1,17 @@
 package org.example;
 import com.itextpdf.text.Chunk;
 import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Element;
 import com.itextpdf.text.Font;
 import com.itextpdf.text.FontFactory;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.PdfWriter;
+import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.lang.Exception.*;
 
 public class Ticket {
     private static int accountStartID =1;
@@ -45,7 +47,8 @@ public class Ticket {
     public boolean generatePdf(){
         try {
             Document document = new Document();
-            String path="/Users/dhruvsingh/Downloads/ticket.pdf";
+            String home = System.getProperty("user.home");
+            File path = new File(home+"/Downloads/"  +this.event.getTitle()+"_ticket.pdf"); 
             PdfWriter.getInstance(document, new FileOutputStream(path));
             document.open();
             Font bold = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
@@ -57,13 +60,13 @@ public class Ticket {
             para0.setAlignment(Element.ALIGN_CENTER);
             para0.setSpacingBefore(20);
             
-            Paragraph para1 = new Paragraph("OASIS Enaugration",bold2);
+            Paragraph para1 = new Paragraph(this.event.getTitle(),bold2);
             para1.setSpacingBefore(50);
             para1.setSpacingAfter(50);
             para1.setAlignment(Element.ALIGN_CENTER);
             
             Paragraph para2 = new Paragraph("Date & Time:",bold);
-            para2.add(new Chunk("         21/11/2022 6:30pm",base));
+            para2.add(new Chunk("         "+this.event.getdatetime(),base));
             para2.setSpacingAfter(25);
             
             Paragraph para3 = new Paragraph("Venue Details:",bold);
@@ -85,7 +88,6 @@ public class Ticket {
             img.setAlignment(Image.TEXTWRAP);
             img.setSpacingAfter(0);
             img.scaleToFit(80f, 80f);
-       //    img.setAlignment(Element.ALIGN_TOP);
             document.add(img);
             document.add(para0);
             document.add(para1);
@@ -97,14 +99,12 @@ public class Ticket {
             document.close();
             return true;
        }
-//        catch (IOException e) {
-//              e.printStackTrace();
-//        }
-//        catch (DocumentException e) {
-//             e .printStackTrace();
-//        }catch(FileNotFoundException e){
-//            e .printStackTrace();
-//        }
+        catch (IOException e) {
+              e.printStackTrace();
+        }
+        catch (DocumentException e) {
+             e .printStackTrace();
+        }
         catch (Exception e) {
             e.printStackTrace();
         }

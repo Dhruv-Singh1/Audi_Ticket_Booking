@@ -1,10 +1,14 @@
 package org.example;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Audi implements Serializable{
-    //seats
     private static Audi single_instance=null ;
     private int seatrows;
     private int seatcolumns;
@@ -12,12 +16,48 @@ public class Audi implements Serializable{
     private static int totalSeats;
     private ArrayList<Event> events;
     private Audi(){
-        seatrows=50;
-        seatcolumns=100;
+        seatrows=10;
+        seatcolumns=10;
         seatsMatrix= new boolean[2][seatrows][seatcolumns];
+        for (int i = 0; i < 2; i++) {
+             this.seatsMatrix[i] = new boolean[seatrows][seatcolumns];
+             for (int j = 0; j < seatrows; j++) {
+                      this.seatsMatrix[i][j] = new boolean[seatcolumns];
+            }
+        }
         totalSeats=2*seatcolumns*seatrows;
+    //    Arrays.toString(seatsMatrix);
     }
 
+    
+    
+    
+    
+    
+    {
+        String filename=  "/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/events.ser";
+        try {
+            events= new ArrayList<Event>();
+            ObjectInputStream is = new ObjectInputStream(new FileInputStream(filename));
+            setEvents((ArrayList<Event>)is.readObject());
+            is.close();
+        }
+        catch(FileNotFoundException e){
+             System.out.println(e);            
+        }
+        catch(IOException e){
+            System.out.println(e);            
+                   
+        }
+        catch(ClassNotFoundException e){
+             System.out.println(e);            
+        }
+        catch(Exception e){
+              System.out.println(e);  
+        }  
+    };
+    
+    
     public static Audi getAudiObj(){
         if(single_instance==null){
             single_instance= new Audi();
@@ -25,6 +65,9 @@ public class Audi implements Serializable{
         }
         return single_instance;
     }
+    
+    
+
     public boolean addEventToAudi(Event event){
         events.add(event);
         return true;
@@ -32,6 +75,10 @@ public class Audi implements Serializable{
 
     public ArrayList<Event> getEvents() {
         return events;
+    }
+    
+    private void  setEvents(ArrayList<Event> events) {
+        this.events=events;
     }
 
     public boolean[][][] getseatsMatrix(){

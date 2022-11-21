@@ -92,8 +92,6 @@ public class App  {
     public static void main(String[] args) throws IOException {
      //   GUI gui   = new GUI();
 
-
-
 // read from file intialize audi class events & registerations
 //        String myTime = "10:30:54";
 //        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm:ss");
@@ -101,55 +99,44 @@ public class App  {
 
         try {
             int t=0;
-            while(t!=1||t!=2) {
+            while(t!=1&&t!=2) {
                 System.out.println("Enter 1 for User Mode");
-                System.out.println("Enter 2 for Admin Mode");
+                System.out.println("Enter 2 for Admin Mode\n");
                 Scanner sc = new Scanner(System.in);
                 t = Integer.parseInt(sc.next());
                 final String os = System.getProperty("os.name");
-                if (t != 1 || t != 2) {
+                if (t != 1 && t != 2) {
                     System.out.println("Invalid Input...");
                 }
-                if (os.contains("Windows")) {
-                    Runtime.getRuntime().exec("cls");
-                } else {
-                    Runtime.getRuntime().exec("clear");
-                }
+//                if (os.contains("Windows")) {
+//                    Runtime.getRuntime().exec("cls");
+//                } else {
+//                    Runtime.getRuntime().exec("clear");
+//                }
             }
             if(t==1){
-
+                   System.out.println("Enter 1 for Login Mode");
+                   System.out.println("Enter 2 for Sign Up Mode");
+                   Scanner sc = new Scanner(System.in);
+                   t = Integer.parseInt(sc.next());
+                   System.out.println("\n\n");
+                   if(t==1){
+                       Student.getLoginObj().login();
+                   }
+                   else if(t==2){
+                       Student.getLoginObj().signup();
+                   }
             }
             else{
-
+                    Admin.getAdminObj().login();
             }
 
 
-        } catch (Exception e) {
+        } catch(NumberFormatException e){
+            System.out.println("Invalid input please Enter a number!!");
+        } 
+        catch (Exception e) {
             e.printStackTrace();
         }
-    
-
-        try {
-            // date = sdf.parse(myTime);
-            // Java program to read character using Scanner
-
-            String time = "17-Jul-2022 18:35";
-            SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy hh:mm");
-            Date date = format.parse(time);
-            System.out.println(date);
-            System.out.println("Enter Password:\t");
-            Scanner sc = new Scanner(System.in);
-           String path ="/Users/dhruvsingh/Downloads";
-
-          //  PdfWriter writer = new PdfWriter(path);
-
-
-        } catch (Exception e) { //ParseException for date
-            e.printStackTrace();
-        }
-        //  String formattedTime = sdf.format(date);
-
-        // System.out.println(formattedTime);
-
     }
 }
