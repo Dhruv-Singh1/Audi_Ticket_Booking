@@ -23,11 +23,15 @@ public class Event implements Comparable<Event>, Serializable {
     ArrayList<Student> registeredForEvent;
     static final long serialVersionUID = 40L;
 
+    public String geteventDuration(){
+         long diff=(endTime.getTime()-startTime.getTime())/60000;
+         return  diff/60+" hrs  "+ diff%60+" mins";
+    }
     
     @Override
     public String toString() {
        //  Period p =Period.between(startTime,endTime);
-       long diff=(endTime.getTime()-startTime.getTime())/60000;
+      
        SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy hh:mm");
             
             
@@ -41,8 +45,7 @@ public class Event implements Comparable<Event>, Serializable {
                 format.format(startTime)  +
                 "\n Event Duration: \t\t" + 
                 
-              diff/60+" hrs  "+
-              diff%60+" mins"         
+                 geteventDuration()
                 
                 +"\n Net Revenue of Event: \t\t" + netRevenue +"Rs\n\n"
              //   "\n Booked Seats:  " + Arrays.toString(bookedSeats)
@@ -53,10 +56,7 @@ public class Event implements Comparable<Event>, Serializable {
     
     // is Booked on date / time ?
     // book method
-    private GregorianCalendar c = new GregorianCalendar();
-    void get_time(){
-        c.getTime();
-    }
+    
     
         public void printSeats(){
             int i=1; char c='N';
@@ -136,6 +136,10 @@ public class Event implements Comparable<Event>, Serializable {
         return startTime;
     }
 
+    public  Date getendTime() {
+        return endTime;
+    }
+
     public  void setstartTime(Date datetime) {
         this.startTime = datetime;
     }
@@ -172,13 +176,7 @@ public class Event implements Comparable<Event>, Serializable {
         this.registeredForEvent = registeredForEvent;
     }
 
-    public GregorianCalendar getC() {
-        return c;
-    }
-
-    public void setC(GregorianCalendar c) {
-        this.c = c;
-    }
+    
 
     
     Event( String title,String organizer, String eventDetails, double ticketPriceNormal,double ticketPricePremium, Date datetime,Date endtime){
@@ -252,6 +250,24 @@ public class Event implements Comparable<Event>, Serializable {
             
             Date endTime = new Date(c.getTimeInMillis()+1000*60*(Integer.parseInt(dr[0])*60 + Integer.parseInt(dr[1])) );
             
+            for(Event e: Audi.getAudiObj().getEvents()){
+                    if(e.getstartTime().compareTo(startDate)<0 || e.getstartTime().compareTo(startDate)==0  ){
+                        //regEvent starts before this event
+                        if(e.getendTime().compareTo(endTime)>0 ||e.getendTime().compareTo(startDate)>0 ){
+                            //regEvent ends after current event startTime or endTIme
+                            System.out.print("\nError time slot clashes with "+e.getTitle()+"it starts at"+e.getstartTime()+"and ends at "+e.getendTime());
+                            System.out.print("\n Please choose another Time slot ");
+                            return null;
+                        }
+                        
+                    }
+                    else{
+                        System.out.print("\nChecked availability of the entered timeslot... ");
+                        break;
+                        
+                    }
+            }
+            
             System.out.print("Enter the price of normal seats:\t");
             double pricen = Double.parseDouble(sc.next());
              System.out.println();
@@ -274,6 +290,74 @@ public class Event implements Comparable<Event>, Serializable {
         }
 
         return null;
+    }
+    
+    public boolean editEvent(){
+        
+        System.out.println("\nEnter the field number you want to edit :");
+        System.out.println("1. Name of Event\n2.Date and Time\n3.Normal ticket Price\n4.Premium Ticket Price\n5.Organizer\n6.Event Details\n");
+        Scanner sc = new Scanner(System.in);
+        int ch = Integer.parseInt(sc.next());
+        switch(ch){
+            case 1:
+                System.out.println("Enter the new Event Name");
+                String name= sc.nextLine();
+                System.out.println("Updated...");
+                this.setTitle(name);
+                this.toString();
+                break;
+            case 2:
+                System.out.println("Enter the new Date and Time");
+                String date= sc.nextLine();
+                System.out.print("Enter the Event date and time in this format dd-MMM-yyyy hh:mm   Eg: 17-Jul-2022 18:35:   ");
+                String startTime= sc.nextLine();
+                SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy hh:mm");
+                 Date startDate ;
+                try{
+                 startDate = format.parse(startTime); 
+                this.setstartTime(startDate);
+                }
+                catch(ParseException e ){
+                        System.out.println("Invalid date format unable to parse...");
+                    }catch (Exception e) { //ParseException for date
+                     e.printStackTrace();
+                 }
+                System.out.println("Updated...");
+                this.toString();
+                break;               
+            case 3:
+                System.out.println("Enter the new Normal Ticket Price");
+                double price= Double.parseDouble(sc.nextLine());
+                this.setTicketPrice(price);
+                System.out.println("Updated...");
+                this.toString();
+                break;
+            case 4:
+              System.out.println("Enter the new Premium Ticket Price");
+                double premiumprice= Double.parseDouble(sc.nextLine());
+                this.setTicketPricePremium(premiumprice);
+                System.out.println("Updated...");
+                this.toString();
+                break;
+            case 5:
+                System.out.println("Enter the new Event Organizer");
+                String org= sc.nextLine();
+                this.setOrganizer(org);
+                System.out.println("Updated...");
+                this.toString();
+                break;
+            case 6:
+                System.out.println("Enter the new Event details");
+                String details= sc.nextLine();
+                this.setEventDetails(details);
+                System.out.println("Updated...");
+                this.toString();
+                break;
+            default:
+                System.out.println("Invalid choice");
+                break;         
+        }
+        return false;
     }
 
 

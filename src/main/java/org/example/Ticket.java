@@ -15,9 +15,10 @@ import java.util.ArrayList;
 
 public class Ticket {
     private static int accountStartID =1;
-    private Event event;
-    private ArrayList<Integer> seatNO;
-    private Student student;
+    protected Event event;
+    protected ArrayList<Integer> premiumseatNO;
+    protected ArrayList<Integer> normalseatNO;
+    protected Student student;
 
     public Ticket(Event event, ArrayList<Integer> seatNO, Student student) {
         this.event = event;
@@ -25,20 +26,26 @@ public class Ticket {
         this.student = student;
     }
 
+    public ArrayList<Integer> getSeatNO() {
+        return seatNO;
+    }
+
     public static Ticket generateTicket(Event e, ArrayList<Integer> seatNO, Student student){
        return new Ticket(e,seatNO,student);
 
     }
 
-    @Override
+   @Override
     public String toString() {
-        return "Ticket{" +
-                "Event :" + event.getTitle() +
-                "Event Time:" + event.getdatetime() +
-                ", seatNO=" + seatNO +
-                ", student=" + student +
-                '}';
-    }
+        return "\nNormal Ticket " +
+                "\nStudent: " + student.getName() +
+                "\nBITS ID: " + student.getBITSID() +
+                "\nEvent :" + event.getTitle() +
+                "\nEvent Time:" + event.getstartTime() +
+                "\nEvent Duration: " +event.geteventDuration()   +
+                "\nPrice "+ event.getTicketPriceNormal()* this.normalseatNO.size()+ event.getTicketPricePremium()*this.premiumseatNO.size() +
+                "\nSeat Numbers=" + premiumseatNO +" "+normalseatNO; 
+              }
 
     public String printTicket() {
         return  toString();
@@ -66,7 +73,7 @@ public class Ticket {
             para1.setAlignment(Element.ALIGN_CENTER);
             
             Paragraph para2 = new Paragraph("Date & Time:",bold);
-            para2.add(new Chunk("         "+this.event.getdatetime(),base));
+            para2.add(new Chunk("         "+this.event.getstartTime(),base));
             para2.setSpacingAfter(25);
             
             Paragraph para3 = new Paragraph("Venue Details:",bold);
@@ -82,7 +89,7 @@ public class Ticket {
             para5.setSpacingAfter(25);
             
             Paragraph para6 = new Paragraph("Total Amount:",bold);
-            para6.add(new Chunk("         "+this.event.getTicketPrice()*this.seatNO.size(),base));
+            para6.add(new Chunk("         "+this.event.getTicketPriceNormal()*this.seatNO.size()    ,base));
             Image img = Image.getInstance("/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/bits-logo.png");
             img.setSpacingBefore(20);
             img.setAlignment(Image.TEXTWRAP);

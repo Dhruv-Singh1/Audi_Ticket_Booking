@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -136,7 +135,7 @@ public boolean logout(){
         System.out.println("Enter 2. Add Event");
         System.out.println("Enter 3. Edit Events");
         System.out.println("Enter 4. Reserve Seats for an Event ");
-        System.out.println("Enter 5. to Login to different Account");
+        System.out.println("Enter 5. to update admin username password");
         System.out.println("Enter 6. Track Revenue of a Event");
         System.out.println("Enter 7. to Logout");       
         int no = Integer.parseInt(sc.next());
@@ -148,16 +147,29 @@ public boolean logout(){
                this.addEvent();
                 break;
             case 3:
-            //    this.bookTicketMenu();
+                this.printEvents();
+                System.out.println("Enter the event number you want to edit...");
+                int a;
+                a= Integer.parseInt( sc.next());
+                Audi.getAudiObj().getEvents().get(a).editEvent();      
                 break;
             case 4:
                 Audi.getAudiObj().getEvents().get(0).printSeats();
                 break;
             case 5:
-                this.login();
+                System.out.println("Enter the New Username");
+                String usr= sc.nextLine();
+                System.out.println("Enter the New password");
+                String pass= sc.nextLine();
+                Admin(usr,pass);
+                 
                 break;
             case 6:
-             
+                this.printEvents();
+                System.out.println("Enter the event number you want to see the revenue");
+                int b;
+                b= Integer.parseInt( sc.next());
+                Audi.getAudiObj().getEvents().get(b).getNetRevenue();      
                 break;
             case 7:
                 this.logout();

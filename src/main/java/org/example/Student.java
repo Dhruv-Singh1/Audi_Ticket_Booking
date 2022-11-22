@@ -27,6 +27,10 @@ public class Student  implements  BaseUser ,Serializable{
         return email;
     }
 
+    public String getBITSID(){
+        return this.bitsID;
+    }
+    
     public void setEmail(String email) {
         this.email = email;
     }
