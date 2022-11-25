@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -40,10 +41,7 @@ public class Admin implements BaseUser , Serializable {
     }
 
  static {
-    
-        
         try {
-            
             String filename=  "/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/admin.ser";
             ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(filename));           
             os.writeObject(new Admin("admin","pass"));
@@ -52,13 +50,11 @@ public class Admin implements BaseUser , Serializable {
             ObjectInputStream is = new ObjectInputStream(new FileInputStream(filename));
             acc=(Admin)is.readObject();
           //  System.out.println(acc);
-            
            // ArrayList<Student> s = (ArrayList<Student>) is.readObject();
             is.close();
         }
         catch(FileNotFoundException e){
              System.out.println(e.toString());
-            
         }
         catch(IOException e){
            
@@ -77,8 +73,6 @@ public class Admin implements BaseUser , Serializable {
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter your username");
         String username = sc.next();
-        
-            
             if (this.getUsername().equals(username)) {
                 System.out.println("Username found in db");
                 System.out.println("Enter your Password");
@@ -103,7 +97,6 @@ public boolean logout(){
         String filename=  "/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/admin.ser";
         try {
             ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(filename));
-            
             //writeObject(os);
             os.close();
             filename=  "/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/events.ser";
@@ -119,9 +112,7 @@ public boolean logout(){
             e.printStackTrace();
         }
          System.out.println("Signing you off..");
-     
         return true;
-
     }
 
 
@@ -147,29 +138,22 @@ public boolean logout(){
                this.addEvent();
                 break;
             case 3:
-                this.printEvents();
-                System.out.println("Enter the event number you want to edit...");
-                int a;
-                a= Integer.parseInt( sc.next());
-                Audi.getAudiObj().getEvents().get(a).editEvent();      
+                editEvent();     
                 break;
             case 4:
                 Audi.getAudiObj().getEvents().get(0).printSeats();
+                
                 break;
             case 5:
                 System.out.println("Enter the New Username");
                 String usr= sc.nextLine();
                 System.out.println("Enter the New password");
                 String pass= sc.nextLine();
-                Admin(usr,pass);
-                 
+                this.setUsername(usr);
+                this.setPassword(pass);
                 break;
             case 6:
-                this.printEvents();
-                System.out.println("Enter the event number you want to see the revenue");
-                int b;
-                b= Integer.parseInt( sc.next());
-                Audi.getAudiObj().getEvents().get(b).getNetRevenue();      
+                this.getEventRevenue();
                 break;
             case 7:
                 this.logout();
@@ -184,7 +168,7 @@ public boolean logout(){
     
     
  
-    void addEvent() {
+    public void addEvent() {
         // take details of event input
        Event event = Event.addEvent();
        if(event!=null){
@@ -194,16 +178,29 @@ public boolean logout(){
        else{
             System.out.println("\nSome Error occured while trying to create Event Try Again!! ");
        }
+    }
+    
+    public void editEvent(){
+        Event event= eventchoiceHelper();
+        event.editEvent();
+    }
+   public void getEventRevenue(){     
+        Event event= eventchoiceHelper();
+        System.out.printf("\n\nTotal revenue till now for %s is:  %,.3f ",event.getTitle(),event.getNetRevenue());
+        System.out.print(" Rs");
+    }
 
+    private Event eventchoiceHelper(){
+        System.out.println("");
+        System.out.println("Following are the Events in the Auditorium:");
+        this.printEvents();
+        System.out.print("\n\nEnter the event number you want to get the revenue for:  ");
+        Scanner sc = new Scanner(System.in);
+        int eno=Integer.parseInt(sc.next());
+        System.out.print(eno);
+        return Audi.getAudiObj().getEvents().get(eno-1);
+    
     }
-    void editEvent(){
-        
-        
-    }
-    void getEventRevenue(){
-        
-    }
-
  
 
 }

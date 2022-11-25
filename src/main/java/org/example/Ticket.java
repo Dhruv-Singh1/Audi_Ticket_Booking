@@ -11,85 +11,109 @@ import com.itextpdf.text.pdf.PdfWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-public class Ticket {
+public class Ticket implements Serializable {
     private static int accountStartID =1;
     protected Event event;
     protected ArrayList<Integer> premiumseatNO;
     protected ArrayList<Integer> normalseatNO;
     protected Student student;
 
-    public Ticket(Event event, ArrayList<Integer> seatNO, Student student) {
+    private static final DecimalFormat df = new DecimalFormat("0.00");
+    
+    public Ticket(Event event, ArrayList<Integer> premiumseatNO,ArrayList<Integer> normalseatNO, Student student) {
         this.event = event;
-        this.seatNO = seatNO;
+        this.normalseatNO=normalseatNO;
+        this.premiumseatNO=premiumseatNO;
         this.student = student;
     }
 
-    public ArrayList<Integer> getSeatNO() {
-        return seatNO;
+    public ArrayList<Integer> getPremiumseatNO() {
+        return premiumseatNO;
     }
 
-    public static Ticket generateTicket(Event e, ArrayList<Integer> seatNO, Student student){
-       return new Ticket(e,seatNO,student);
+    public ArrayList<Integer> getNormalseatNO() {
+        return normalseatNO;
+    }
 
+    public static Ticket generateTicket(Event e, ArrayList<Integer> normalseatNO,ArrayList<Integer> premiumseatNO ,Student student){
+       return new Ticket(e,normalseatNO,premiumseatNO,student);
     }
 
    @Override
     public String toString() {
-        return "\nNormal Ticket " +
-                "\nStudent: " + student.getName() +
+        
+        return "\n\n"+ event.getTitle() +" Ticket " +
+                "\nStudent: " + student.getStuName() +
                 "\nBITS ID: " + student.getBITSID() +
-                "\nEvent :" + event.getTitle() +
                 "\nEvent Time:" + event.getstartTime() +
                 "\nEvent Duration: " +event.geteventDuration()   +
-                "\nPrice "+ event.getTicketPriceNormal()* this.normalseatNO.size()+ event.getTicketPricePremium()*this.premiumseatNO.size() +
-                "\nSeat Numbers=" + premiumseatNO +" "+normalseatNO; 
+                "\nTotal Price:  "+ df.format(event.getTicketPriceNormal()* this.normalseatNO.size()+ event.getTicketPricePremium()*this.premiumseatNO.size()) +
+                "\nSeat Numbers: " + seatArrayToString(premiumseatNO)+"  "+seatArrayToString(normalseatNO); 
               }
-
+    
+    public String seatArrayToString(ArrayList<Integer> seatNo){
+        StringBuilder seats= new StringBuilder("");
+        
+        for(int seat : seatNo){
+             if(this.premiumseatNO==seatNo ){
+                     seats=seats.append("P"+Integer.toString(seat)+"  ");                      
+             }
+             else{
+                  seats=seats.append("N"+Integer.toString(seat)+"  ");
+                 
+             }      
+        }
+        
+         return seats.toString();
+    }
+        
     public String printTicket() {
-        return  toString();
+        return  this.toString();
     }
     
     public boolean generatePdf(){
         try {
             Document document = new Document();
             String home = System.getProperty("user.home");
-            File path = new File(home+"/Downloads/"  +this.event.getTitle()+"_ticket.pdf"); 
+            File path = new File(home+"/Downloads/"  +this.event.getTitle()+"_ticket.pdf");
             PdfWriter.getInstance(document, new FileOutputStream(path));
             document.open();
             Font bold = new Font(Font.FontFamily.HELVETICA, 12, Font.BOLD);
             Font boldsp = new Font(Font.FontFamily.HELVETICA, 14, Font.BOLD);
             Font bold2 = new Font(Font.FontFamily.HELVETICA, 16, Font.BOLD);
             Font base = FontFactory.getFont(FontFactory.TIMES_ROMAN, 12,Font.ITALIC);
-            
+
             Paragraph para0 = new Paragraph("   BIRLA INSTITUE OF TECHNOLOGY AND SCIENCE,PILANI  (Pilani Campus)",boldsp);
             para0.setAlignment(Element.ALIGN_CENTER);
             para0.setSpacingBefore(20);
-            
+
             Paragraph para1 = new Paragraph(this.event.getTitle(),bold2);
             para1.setSpacingBefore(50);
             para1.setSpacingAfter(50);
             para1.setAlignment(Element.ALIGN_CENTER);
-            
+
             Paragraph para2 = new Paragraph("Date & Time:",bold);
             para2.add(new Chunk("         "+this.event.getstartTime(),base));
             para2.setSpacingAfter(25);
-            
+
             Paragraph para3 = new Paragraph("Venue Details:",bold);
             para3.add(new Chunk("         Main Audi",base));
             para3.setSpacingAfter(25);
-            
+
             Paragraph para4 = new Paragraph("Student Name:",bold);
-            para4.add(new Chunk("         "+this.student.getName(),base));
+            para4.add(new Chunk("         "+this.student.getStuName(),base));
             para4.setSpacingAfter(25);
-           
+
             Paragraph para5 = new Paragraph("Seat Number:",bold);
-            para5.add(new Chunk("         "+this.seatNO,base));
+            para5.add(new Chunk("         "+seatArrayToString(premiumseatNO)+"  "+seatArrayToString(normalseatNO) ,base));
             para5.setSpacingAfter(25);
-            
+
             Paragraph para6 = new Paragraph("Total Amount:",bold);
-            para6.add(new Chunk("         "+this.event.getTicketPriceNormal()*this.seatNO.size()    ,base));
+            para6.add(new Chunk("         "+  df.format(event.getTicketPriceNormal()* this.normalseatNO.size()+ event.getTicketPricePremium()*this.premiumseatNO.size())   ,base));
             Image img = Image.getInstance("/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/bits-logo.png");
             img.setSpacingBefore(20);
             img.setAlignment(Image.TEXTWRAP);
@@ -115,7 +139,7 @@ public class Ticket {
         catch (Exception e) {
             e.printStackTrace();
         }
-    
+
         return false;
     }
 }

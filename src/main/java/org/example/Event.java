@@ -19,8 +19,9 @@ public class Event implements Comparable<Event>, Serializable {
     private boolean [][][] bookedSeats;
     private Audi audi = Audi.getAudiObj();
     private  double netRevenue;
+    RegisteredStudents registeredStudents ;
     private int seatno []=new int[Audi.getTotalSeats()];
-    ArrayList<Student> registeredForEvent;
+    
     static final long serialVersionUID = 40L;
 
     public String geteventDuration(){
@@ -31,10 +32,7 @@ public class Event implements Comparable<Event>, Serializable {
     @Override
     public String toString() {
        //  Period p =Period.between(startTime,endTime);
-      
        SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy hh:mm");
-            
-            
         return
                 "\n\t" + title  +
                 "\t   by: " + organizer + 
@@ -43,14 +41,10 @@ public class Event implements Comparable<Event>, Serializable {
                 "\n Price of Premium Seats: \t" + ticketPricePremium +
                 "\n Start Time: \t\t\t" + 
                 format.format(startTime)  +
-                "\n Event Duration: \t\t" + 
-                
-                 geteventDuration()
-                
-                +"\n Net Revenue of Event: \t\t" + netRevenue +"Rs\n\n"
-             //   "\n Booked Seats:  " + Arrays.toString(bookedSeats)
-                
-                 ;
+                "\n Event Duration: \t\t" +geteventDuration()                
+//                +"\n Net Revenue of Event: \t\t" + netRevenue +"Rs\n\n"
+//             //   "\n Booked Seats:  " + Arrays.toString(bookedSeats)
+                ;
     }
 
     
@@ -83,7 +77,8 @@ public class Event implements Comparable<Event>, Serializable {
     Event(){
         this.eventDetails=null;
         this.organizer=null;
-        this.registeredForEvent=new ArrayList<>();
+        //intializing the inner class
+      //  this.registeredStudents = this.new RegisteredStudents();
         this.title=null;
         this.ticketPriceNormal=0.00;
         this.netRevenue=0.00;
@@ -125,7 +120,7 @@ public class Event implements Comparable<Event>, Serializable {
         this.ticketPriceNormal = ticketPrice;
     }
       public double getTicketPricePremium() {
-        return ticketPriceNormal;
+        return ticketPricePremium;
     }
 
     public void setTicketPricePremium(double ticketPrice) {
@@ -168,13 +163,6 @@ public class Event implements Comparable<Event>, Serializable {
         this.seatno = seatno;
     }
 
-    public ArrayList<Student> getRegisteredForEvent() {
-        return registeredForEvent;
-    }
-
-    public void setRegisteredForEvent(ArrayList<Student> registeredForEvent) {
-        this.registeredForEvent = registeredForEvent;
-    }
 
     
 
@@ -182,7 +170,7 @@ public class Event implements Comparable<Event>, Serializable {
     Event( String title,String organizer, String eventDetails, double ticketPriceNormal,double ticketPricePremium, Date datetime,Date endtime){
         this.eventDetails=eventDetails;
         this.organizer=organizer;
-        this.registeredForEvent=new ArrayList<>();
+        this.registeredStudents= this.new RegisteredStudents();
         this.title=title;
         this.ticketPriceNormal=ticketPriceNormal;
         this.ticketPricePremium=ticketPricePremium;
@@ -205,19 +193,23 @@ public class Event implements Comparable<Event>, Serializable {
         return this.getstartTime().compareTo(event.getstartTime());
     }
 
-    
+
+    public void setNetRevenue(double netRevenue) {
+        this.netRevenue = netRevenue;
+    }
+
     public static Event addEvent(){
        
         try {
            
             File file = new File("/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/events.txt");
-             try{
-            Scanner fileSc = new Scanner(file);
-             }
-             
-             catch (FileNotFoundException ex) {
-            System.out.println("Error!! Input text file not found");;
-             }
+//             try{
+//            Scanner fileSc = new Scanner(file);
+//             }
+//             
+//             catch (FileNotFoundException ex) {
+//            System.out.println("Error!! Input text file not found");;
+//             }
                 
              Scanner sc = new Scanner(System.in);
             System.out.print("Enter the name of Event:\t");
@@ -232,10 +224,7 @@ public class Event implements Comparable<Event>, Serializable {
             System.out.println();
             
             System.out.print("Enter the Event date and time in this format dd-MMM-yyyy hh:mm   Eg: 17-Jul-2022 18:35:   ");
-            String startTime= sc.nextLine();
-            
-           
-         
+            String startTime= sc.nextLine();        
             SimpleDateFormat format = new SimpleDateFormat("dd-MMM-yyyy hh:mm");
             System.out.print("\t");
             Date startDate = format.parse(startTime);
@@ -255,38 +244,44 @@ public class Event implements Comparable<Event>, Serializable {
                         //regEvent starts before this event
                         if(e.getendTime().compareTo(endTime)>0 ||e.getendTime().compareTo(startDate)>0 ){
                             //regEvent ends after current event startTime or endTIme
-                            System.out.print("\nError time slot clashes with "+e.getTitle()+"it starts at"+e.getstartTime()+"and ends at "+e.getendTime());
+                            System.out.print("\nError time slot clashes with "+e.getTitle()+" it starts at "+e.getstartTime()+" and ends at "+e.getendTime());
                             System.out.print("\n Please choose another Time slot ");
                             return null;
-                        }
-                        
+                        }               
                     }
-                    else{
-                        System.out.print("\nChecked availability of the entered timeslot... ");
-                        break;
-                        
-                    }
+                    
+                    if(e.getstartTime().compareTo(startDate)>0&&e.getstartTime().compareTo(endTime)<0 ){                                          
+                        //regEvent starts after this event but this event ends after start of regEvent
+                        System.out.print("\nError time slot clashes with "+e.getTitle()+" it starts at "+e.getstartTime()+" and ends at "+e.getendTime());
+                        System.out.print("\n\nPlease choose another Time slot ");
+                        return null;                        
+                    }              
             }
             
-            System.out.print("Enter the price of normal seats:\t");
-            double pricen = Double.parseDouble(sc.next());
-             System.out.println();
              
-             System.out.print("Enter the price of premium seats:\t");
-             double pricep = Double.parseDouble(sc.next());
-             System.out.println();
-             sc.nextLine();
+            System.out.print("\nChecked availability of the entered timeslot... ");
+                  
+            System.out.print("\nEnter the price of normal seats:\t");
+            double pricen = Double.parseDouble(sc.next());
+            System.out.println();
+             
+            System.out.print("Enter the price of premium seats:\t");
+            double pricep = Double.parseDouble(sc.next());
+            System.out.println();
+            sc.nextLine();
             System.out.print("Enter the event details:\t");
             String details= sc.nextLine();
+            //System.out.println()"Event added s";
+            return new Event(title,organizer,details,pricen,pricep,startDate,endTime);
+            
 
-             return new Event(title,organizer,details,pricen,pricep,startDate,endTime);
-
-
-        }  
+        }   catch(NumberFormatException e ){
+               System.out.println("Entered data is not a number");
+           }
            catch(ParseException e ){
                System.out.println("Invalid date format unable to parse...");
            }catch (Exception e) { //ParseException for date
-            e.printStackTrace();
+             System.out.println(e);
         }
 
         return null;
@@ -365,22 +360,25 @@ public class Event implements Comparable<Event>, Serializable {
     
     
     class RegisteredStudents extends Event {
-        
+        ArrayList<Student> registeredForEvent;
+        RegisteredStudents(){
+            registeredForEvent= new ArrayList<>();
+        }
 
-        public void addStudent(Student usr,int seatcount) {
+        public void addStudent(Student usr) {
 
             registeredForEvent.add(usr);
          //   netRevenue+=  //which seat typt  x* seatcount;
-
-
         }
 
-        public void addStudents(ArrayList<Student> usr) {
-            registeredForEvent.addAll(usr);
-        }
+//        public void addStudents(ArrayList<Student> usr) {
+//            registeredForEvent.addAll(usr);
+//        }
 
 
 
     }
+
+    
 
 }

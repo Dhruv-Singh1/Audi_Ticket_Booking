@@ -26,14 +26,8 @@ public class Audi implements Serializable{
             }
         }
         totalSeats=2*seatcolumns*seatrows;
-    //    Arrays.toString(seatsMatrix);
     }
-
-    
-    
-    
-    
-    
+       
     {
         String filename=  "/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/events.ser";
         try {

@@ -5,21 +5,21 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Scanner;
 
-public class Student  implements  BaseUser ,Serializable{
+public class Student  extends Thread implements  BaseUser ,Serializable{
     private String name;
     private String bitsID;
     private String email;
     private String password;
-    private ArrayList<Event> registeredEvents;
+    private ArrayList<Ticket> bookedTickets ;
     private static ArrayList<Student> students;
     double SWDCharges;
     static final long serialVersionUID = 38L;
 
-    public String getName() {
+    public String getStuName() {
         return name;
     }
 
-    public void setName(String name) {
+    public void seStutName(String name) {
         this.name = name;
     }
 
@@ -74,14 +74,15 @@ public class Student  implements  BaseUser ,Serializable{
             is.close();
         }
         catch(FileNotFoundException e){
-            // System.out.println("");            
+             System.out.println(e.toString());            
         }
         catch(IOException e){
            
                    
         }
         catch(ClassNotFoundException e){
-            e.printStackTrace();
+          //  e.printStackTrace();
+            System.out.println(e);
         }
     };
 
@@ -89,6 +90,7 @@ public class Student  implements  BaseUser ,Serializable{
         this.name=null;
         this.email=null;
         this.password=null;
+        this.bookedTickets= new ArrayList<>();
     }
     Student(String name, String bitsID, String email, String password){
         if(name!=null){
@@ -103,6 +105,7 @@ public class Student  implements  BaseUser ,Serializable{
             this.password=password;
         }
         this.bitsID= bitsID;
+        this.bookedTickets= new ArrayList<>();
 
 
     }
@@ -135,25 +138,32 @@ public class Student  implements  BaseUser ,Serializable{
         } System.out.println("\nsession deserialized");
     }
 
-    void clearOldEvents(){
-        Date d= new Date();
-        for(int i=0;i<registeredEvents.size();i++){
-            // registeredEvents[i].get_time()<d.;
+//    void clearOldEvents(){
+//        Date d= new Date();
+//        for(int i=0;i<registeredEvents.size();i++){
+//            // registeredEvents[i].get_time()<d.;
+//
+//        }
+//    }
 
+
+
+    public void viewRegisteredEvents(){
+
+        System.out.println("\nYou have registered for the following events: ");
+        int i=1;
+        for(Ticket ticket : bookedTickets){
+            System.out.println(i++ +". ");
+            System.out.println(ticket.toString());
+            System.out.println();
         }
-    }
-
-
-
-    public ArrayList<Event> viewRegisteredEvents(){
-        return registeredEvents;
     }
     
     public static Student getLoginObj(){
         return new Student();
     }
     
-    @Override
+ 
     public  boolean login(){
         Scanner sc = new Scanner(System.in);
         System.out.println("Enter your Email");
@@ -170,7 +180,7 @@ public class Student  implements  BaseUser ,Serializable{
                 if (student.getPassword().equals(password)) {
                     System.out.println("Login Successful ");
                     
-                    student.studentHomePage();
+                    student.run();
                     return true;
                     //call user home page
                 } else {
@@ -245,17 +255,26 @@ public class Student  implements  BaseUser ,Serializable{
 
     }
     
+    @Override
+    public void run(){
+       studentHomePage();
+   }
+    
     public void studentHomePage(){
-        System.out.println("Hii "+this.getName());
-        System.out.println("Enter 1. to see upcoming Event List");
-        System.out.println("Enter 2. to book Ticket");
-        System.out.println("Enter 3. to cancel booked Tickets");
-        System.out.println("Enter 4. to  see your registered events");
-        System.out.println("Enter 5. to Login to different Account");
-        System.out.println("Enter 6. to SignUp to a new Accounts");
-        System.out.println("Enter 7. to Logout");
         Scanner sc = new Scanner(System.in);
+      char ch='a';
+      while(ch!='q'){
+        System.out.println("Hii "+this.getStuName());
+        System.out.println("\nEnter 1. to see upcoming Event List");
+        System.out.println("Enter 2. to book Ticket");
+        System.out.println("Enter 3. to download Ticket PDF");
+        System.out.println("Enter 4. to cancel booked Tickets");
+        System.out.println("Enter 5. to  see your registered events");
+        System.out.println("Enter 6. to Login to different Account");
+        System.out.println("Enter 7. to SignUp to a new Accounts");
+        System.out.println("Enter 8. to Logout");
         int no = Integer.parseInt(sc.next());
+         System.out.println();
         switch(no){
             case 1:
                 this.printEvents();
@@ -264,22 +283,34 @@ public class Student  implements  BaseUser ,Serializable{
                 this.bookTicketMenu();
                 break;
             case 3:
-                this.bookTicketMenu();
+//             
+                this.viewRegisteredEvents();
+                 System.out.println("\nEnter the Event number for which you want to Download your Ticket PDF ");
+                 int eno=Integer.parseInt(sc.next());
+                 this.bookedTickets.get(eno-1).generatePdf();
+                 System.out.println("\nTicket PDF for "+ this.bookedTickets.get(eno-1).event.getTitle()+" saved to Downloads folder...");
                 break;
             case 4:
-                printEvents();
+//                this.cancelTicket();
                 break;
             case 5:
-                this.login();
+                this.viewRegisteredEvents();
                 break;
             case 6:
-                this.signup();
+                this.login();
                 break;
             case 7:
+                this.signup();
+                break;
+            case 8:
                 this.logout();
                 break;
             default:
         }
+        
+        System.out.println("Enter q to quit any other key to continue");
+         ch=sc.next().charAt(0);
+      }
     }
     
     
@@ -298,69 +329,79 @@ public class Student  implements  BaseUser ,Serializable{
     
 
     synchronized  private  boolean bookTicket(Event event){
-        //display audi seats
-//        for (int s = 0; s < event.getBookedSeats().length; s++) {
-//            for (int r = 0; r < event.getBookedSeats()[0].length; r++) {
-//                for (int c = 0; c < event.getBookedSeats()[0][0].length; c++) {
-//                    System.out.println(" ");
-//                }
-//            }
-//        }
-
+        // Displaying available seats
         event.printSeats();
-        System.out.println();
-        System.out.println("Select Seats: ");
+        
+        System.out.println("Note enter the Seat number without the prefix 'P' or 'N' ");
+        System.out.println("Enter Seats: ");
         //take seats input
         String seats;
         Scanner sc = new Scanner(System.in);
-        seats=sc.next();
+        seats=sc.nextLine();
         String [] seatno = seats.split(" ");
-        Integer [] intseatno = new Integer[seatno.length];
-
-        for (int i = 0; i < seatno.length; i++) {
-            intseatno[i] = Integer.valueOf(seatno[i]);
-
-
-        }
+     //   Integer [] intseatno = new Integer[seatno.length];
+        ArrayList<Integer> normalSeats = new ArrayList<>();
+        ArrayList<Integer> premiumSeats = new ArrayList<>();
+//        for (int i = 0; i < seatno.length; i++) {
+//            intseatno[i] =
+//            if()
+//       // differentiate  between normal and premium seats ?? based on seat Number
+//     }
         boolean errorflag=false;
         for (int i = 0; i < seatno.length; i++) {
-
+            int seatnumber = Integer.parseInt(seatno[i])-1;
             Audi audi = Audi.getAudiObj();
-            int row = intseatno[i] / audi.getSeatrows();
-            int col = intseatno[i] % audi.getSeatrows();
+            int row = seatnumber / audi.getSeatrows();
+            int col = seatnumber % audi.getSeatcolumns();
             int floor = 0;
-            if (row>= audi.getSeatcolumns()) {
+            if (row>= audi.getSeatrows()) {
                 floor = 1;
-                row = (intseatno[i]- audi.getSeatrows())/ audi.getSeatcolumns();
+                row = (seatnumber- audi.getSeatrows()*audi.getSeatcolumns())/ audi.getSeatrows();
             }
+               
             boolean[][][] bookedSeats = event.getBookedSeats();
-            if (bookedSeats[row][col][floor]) {
-
-                System.out.println("Error the Entered Seat number" + intseatno[i] + "is already booked!!\nEnter unbooked seat No");
+            if (bookedSeats[floor][row][col]) {
+                System.out.println("Error the Entered Seat number" + seatnumber+1 + "is already booked!!\nEnter unbooked seat No");
                 errorflag=true;
                 break;
             }
-
             else {
-                bookedSeats[row][col][floor]=true;
+               
+                bookedSeats[floor][row][col]=true;
+                if(col>= (audi.getSeatcolumns()/3) && col<= (2*audi.getSeatcolumns()/3) ){
+                     premiumSeats.add(Integer.valueOf(seatno[i]));
+                }
+                else {
+                      normalSeats.add(Integer.valueOf(seatno[i]));
+                }
             }
         }
-
+        
+        
         //checked for valid avail seats
         if(!errorflag){
-            SWDCharges += seatno.length*event.getTicketPrice();
-            Ticket.generateTicket(event,new ArrayList<>(Arrays.asList(intseatno)),this);
-            //add usr to events registered user
-            //add event revenue
-            System.out.println("Tickets booked Successfully!!");
+            System.out.println(normalSeats);
+            System.out.println(premiumSeats);      
+            double toatlAmount= normalSeats.size()*event.getTicketPriceNormal()+event.getTicketPricePremium()* premiumSeats.size();
+            Ticket ticket=Ticket.generateTicket(event,normalSeats,premiumSeats,this );
+            if(ticket==null){
+                 System.out.println("Error!! couldn't generate the Ticket");
+                 return false;
+            }
+            else{
+            bookedTickets.add(ticket);
+            SWDCharges+=toatlAmount;
+            //adding to net event revenue
+            event.setNetRevenue(event.getNetRevenue()+toatlAmount);
+           //event.
+           System.out.println("Toatal Price paid: "+normalSeats.size()+"*"+event.getTicketPriceNormal()+"+"+premiumSeats.size()+"*"+event.getTicketPricePremium());
+           System.out.println("Tickets booked Successfully!!");
+           System.out.println("\n"+ticket.toString());
+           event.registeredStudents.addStudent(this);
             return true;
         }
-        else{
-            System.out.println("");
-
-        }
         //generated ticket details
-
+        }
         return false;
 
     }

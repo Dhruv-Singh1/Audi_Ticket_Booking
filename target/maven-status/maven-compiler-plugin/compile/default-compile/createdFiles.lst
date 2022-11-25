@@ -1,0 +1,9 @@
+org/example/GUI.class
+org/example/Event$RegisteredStudents.class
+org/example/App.class
+org/example/Audi.class
+org/example/Student.class
+org/example/Ticket.class
+org/example/Admin.class
+org/example/Event.class
+org/example/BaseUser.class
