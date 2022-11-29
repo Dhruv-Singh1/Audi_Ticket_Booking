@@ -21,16 +21,25 @@ public class Ticket implements Serializable {
     protected ArrayList<Integer> premiumseatNO;
     protected ArrayList<Integer> normalseatNO;
     protected Student student;
+    protected double ticketPrice;
 
     private static final DecimalFormat df = new DecimalFormat("0.00");
     
-    public Ticket(Event event, ArrayList<Integer> premiumseatNO,ArrayList<Integer> normalseatNO, Student student) {
+    public Ticket(Event event, ArrayList<Integer> normalseatNO,ArrayList<Integer> premiumseatNO, Student student) {
         this.event = event;
         this.normalseatNO=normalseatNO;
         this.premiumseatNO=premiumseatNO;
         this.student = student;
+        this.ticketPrice=event.getTicketPriceNormal()* this.normalseatNO.size()+ event.getTicketPricePremium()*this.premiumseatNO.size();
     }
-
+    
+    public double getTicketPrice(){
+        return this.ticketPrice;
+    }
+    
+     public Event getEvent(){
+        return this.event;
+    }
     public ArrayList<Integer> getPremiumseatNO() {
         return premiumseatNO;
     }
@@ -51,7 +60,7 @@ public class Ticket implements Serializable {
                 "\nBITS ID: " + student.getBITSID() +
                 "\nEvent Time:" + event.getstartTime() +
                 "\nEvent Duration: " +event.geteventDuration()   +
-                "\nTotal Price:  "+ df.format(event.getTicketPriceNormal()* this.normalseatNO.size()+ event.getTicketPricePremium()*this.premiumseatNO.size()) +
+                "\nTotal Price:  "+ df.format(this.getTicketPrice()) +
                 "\nSeat Numbers: " + seatArrayToString(premiumseatNO)+"  "+seatArrayToString(normalseatNO); 
               }
     

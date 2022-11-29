@@ -202,21 +202,14 @@ public class Event implements Comparable<Event>, Serializable {
        
         try {
            
-            File file = new File("/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/events.txt");
-//             try{
-//            Scanner fileSc = new Scanner(file);
-//             }
-//             
-//             catch (FileNotFoundException ex) {
-//            System.out.println("Error!! Input text file not found");;
-//             }
+            File file = new File("/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/EventsInput.txt");
+          //reads input from EventsInput text file
+          //  Scanner sc = new Scanner(file);
+             
                 
              Scanner sc = new Scanner(System.in);
             System.out.print("Enter the name of Event:\t");
-            String title;
-//            if (fileSc.hasNextLine())
-//                title= fileSc.nextLine();
-            title= sc.nextLine();
+            String title= sc.nextLine();
             System.out.println();
              
             System.out.print("Enter the name of Organizer:\t");
@@ -293,6 +286,7 @@ public class Event implements Comparable<Event>, Serializable {
         System.out.println("1. Name of Event\n2.Date and Time\n3.Normal ticket Price\n4.Premium Ticket Price\n5.Organizer\n6.Event Details\n");
         Scanner sc = new Scanner(System.in);
         int ch = Integer.parseInt(sc.next());
+        sc.nextLine();
         switch(ch){
             case 1:
                 System.out.println("Enter the new Event Name");
@@ -322,13 +316,15 @@ public class Event implements Comparable<Event>, Serializable {
                 break;               
             case 3:
                 System.out.println("Enter the new Normal Ticket Price");
+              
                 double price= Double.parseDouble(sc.nextLine());
                 this.setTicketPrice(price);
                 System.out.println("Updated...");
                 this.toString();
                 break;
             case 4:
-              System.out.println("Enter the new Premium Ticket Price");
+                System.out.println("Enter the new Premium Ticket Price");
+              
                 double premiumprice= Double.parseDouble(sc.nextLine());
                 this.setTicketPricePremium(premiumprice);
                 System.out.println("Updated...");
@@ -360,25 +356,19 @@ public class Event implements Comparable<Event>, Serializable {
     
     
     class RegisteredStudents extends Event {
+        
         ArrayList<Student> registeredForEvent;
+        
         RegisteredStudents(){
             registeredForEvent= new ArrayList<>();
         }
-
+        
         public void addStudent(Student usr) {
-
             registeredForEvent.add(usr);
-         //   netRevenue+=  //which seat typt  x* seatcount;
+        }
+          public void removeStudent(Student usr) {
+            registeredForEvent.remove(usr);
         }
 
-//        public void addStudents(ArrayList<Student> usr) {
-//            registeredForEvent.addAll(usr);
-//        }
-
-
-
     }
-
-    
-
 }

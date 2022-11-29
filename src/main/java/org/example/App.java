@@ -63,12 +63,14 @@ public class App  {
     public static void main(String[] args) throws IOException {
      //   GUI gui   = new GUI();
         try {
+            Scanner sc = new Scanner(System.in);
+           
             int t=0;
             while(t!=3) {
                 System.out.println("Enter 1 for User Mode");
                 System.out.println("Enter 2 for Admin Mode");
                 System.out.println("Enter 3 to Exit\n");
-                Scanner sc = new Scanner(System.in);
+              
                 t = Integer.parseInt(sc.next());                          
             switch(t){               
                 case 1:

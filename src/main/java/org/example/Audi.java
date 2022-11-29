@@ -16,8 +16,8 @@ public class Audi implements Serializable{
     private static int totalSeats;
     private ArrayList<Event> events;
     private Audi(){
-        seatrows=10;
-        seatcolumns=10;
+        seatrows=5;
+        seatcolumns=5;
         seatsMatrix= new boolean[2][seatrows][seatcolumns];
         for (int i = 0; i < 2; i++) {
              this.seatsMatrix[i] = new boolean[seatrows][seatcolumns];

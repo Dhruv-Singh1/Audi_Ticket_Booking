@@ -185,7 +185,14 @@ public boolean logout(){
         event.editEvent();
     }
    public void getEventRevenue(){     
-        Event event= eventchoiceHelper();
+        System.out.println("");
+        System.out.println("Following are the Events in the Auditorium:");
+        this.printEvents();
+        System.out.print("\n\nEnter the event number you want to get revenue for :  ");
+        Scanner sc = new Scanner(System.in);
+        int eno=Integer.parseInt(sc.nextLine());
+        System.out.print(eno);
+        Event event= Audi.getAudiObj().getEvents().get(eno-1);
         System.out.printf("\n\nTotal revenue till now for %s is:  %,.3f ",event.getTitle(),event.getNetRevenue());
         System.out.print(" Rs");
     }
@@ -194,9 +201,9 @@ public boolean logout(){
         System.out.println("");
         System.out.println("Following are the Events in the Auditorium:");
         this.printEvents();
-        System.out.print("\n\nEnter the event number you want to get the revenue for:  ");
+        System.out.print("\n\nEnter the event number you want to edit the details :  ");
         Scanner sc = new Scanner(System.in);
-        int eno=Integer.parseInt(sc.next());
+        int eno=Integer.parseInt(sc.nextLine());
         System.out.print(eno);
         return Audi.getAudiObj().getEvents().get(eno-1);
     

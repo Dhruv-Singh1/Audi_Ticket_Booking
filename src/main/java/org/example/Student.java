@@ -124,6 +124,7 @@ public class Student  extends Thread implements  BaseUser ,Serializable{
         System.out.println("session serialized");
     }
 
+    
     // Control how we read in Student(s).
     @Serial
     private void readObject(ObjectInputStream ois)
@@ -138,13 +139,6 @@ public class Student  extends Thread implements  BaseUser ,Serializable{
         } System.out.println("\nsession deserialized");
     }
 
-//    void clearOldEvents(){
-//        Date d= new Date();
-//        for(int i=0;i<registeredEvents.size();i++){
-//            // registeredEvents[i].get_time()<d.;
-//
-//        }
-//    }
 
 
 
@@ -180,7 +174,13 @@ public class Student  extends Thread implements  BaseUser ,Serializable{
                 if (student.getPassword().equals(password)) {
                     System.out.println("Login Successful ");
                     
-                    student.run();
+                    student.start();
+                    try{
+                    student.join();
+                    }catch(Exception e){
+                        e.printStackTrace();
+                    }
+
                     return true;
                     //call user home page
                 } else {
@@ -238,10 +238,16 @@ public class Student  extends Thread implements  BaseUser ,Serializable{
     public boolean logout(){
         String filename=  "/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/student.ser";
         try {
-            ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(filename));
-            os.writeObject(students);
-            os.flush();
-            os.close();
+            ObjectOutputStream osStud = new ObjectOutputStream(new FileOutputStream(filename));
+            osStud.writeObject(students);
+            osStud.flush();
+            osStud.close();
+           filename=  "/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/events.ser";
+            ObjectOutputStream osEven = new ObjectOutputStream(new FileOutputStream(filename));
+            osEven.writeObject(Audi.getAudiObj().getEvents());
+            osEven.flush();
+            osEven.close();
+         //   saveToFile();
         }
         catch(FileNotFoundException e){
             // System.out.println("");
@@ -258,23 +264,26 @@ public class Student  extends Thread implements  BaseUser ,Serializable{
     @Override
     public void run(){
        studentHomePage();
+       
    }
     
-    public void studentHomePage(){
-        Scanner sc = new Scanner(System.in);
+      synchronized public void  studentHomePage(){
+      Scanner sc = new Scanner(System.in);
       char ch='a';
       while(ch!='q'){
-        System.out.println("Hii "+this.getStuName());
+        System.out.println("Hii "+this.getStuName()+"!!");
         System.out.println("\nEnter 1. to see upcoming Event List");
         System.out.println("Enter 2. to book Ticket");
         System.out.println("Enter 3. to download Ticket PDF");
         System.out.println("Enter 4. to cancel booked Tickets");
-        System.out.println("Enter 5. to  see your registered events");
-        System.out.println("Enter 6. to Login to different Account");
-        System.out.println("Enter 7. to SignUp to a new Accounts");
-        System.out.println("Enter 8. to Logout");
+        System.out.println("Enter 5. to  see the total amount spent on Tickets"); 
+        System.out.println("Enter 6. to  see your registered events");
+        System.out.println("Enter 7. to Login to different Account");
+        System.out.println("Enter 8. to SignUp to a new Accounts");
+        System.out.println("Enter 9. to Logout");
         int no = Integer.parseInt(sc.next());
-         System.out.println();
+         System.out.println(no);
+         
         switch(no){
             case 1:
                 this.printEvents();
@@ -282,8 +291,7 @@ public class Student  extends Thread implements  BaseUser ,Serializable{
             case 2:
                 this.bookTicketMenu();
                 break;
-            case 3:
-//             
+            case 3:             
                 this.viewRegisteredEvents();
                  System.out.println("\nEnter the Event number for which you want to Download your Ticket PDF ");
                  int eno=Integer.parseInt(sc.next());
@@ -291,21 +299,26 @@ public class Student  extends Thread implements  BaseUser ,Serializable{
                  System.out.println("\nTicket PDF for "+ this.bookedTickets.get(eno-1).event.getTitle()+" saved to Downloads folder...");
                 break;
             case 4:
-//                this.cancelTicket();
+                this.cancelTicket();
                 break;
             case 5:
-                this.viewRegisteredEvents();
+                 System.out.println("\n\nYour Total amount for Tickets are: " +this.getSWDCharges());
+               
                 break;
             case 6:
-                this.login();
+                this.viewRegisteredEvents();
                 break;
             case 7:
-                this.signup();
+                this.login();
                 break;
             case 8:
+                this.signup();
+                break;
+            case 9:
                 this.logout();
                 break;
             default:
+                 System.out.println("Error!! Invalid Input");
         }
         
         System.out.println("Enter q to quit any other key to continue");
@@ -315,6 +328,8 @@ public class Student  extends Thread implements  BaseUser ,Serializable{
     
     
  
+      
+      
     
     
     public void bookTicketMenu(){
@@ -339,14 +354,11 @@ public class Student  extends Thread implements  BaseUser ,Serializable{
         Scanner sc = new Scanner(System.in);
         seats=sc.nextLine();
         String [] seatno = seats.split(" ");
-     //   Integer [] intseatno = new Integer[seatno.length];
+  
         ArrayList<Integer> normalSeats = new ArrayList<>();
         ArrayList<Integer> premiumSeats = new ArrayList<>();
-//        for (int i = 0; i < seatno.length; i++) {
-//            intseatno[i] =
-//            if()
-//       // differentiate  between normal and premium seats ?? based on seat Number
-//     }
+        
+
         boolean errorflag=false;
         for (int i = 0; i < seatno.length; i++) {
             int seatnumber = Integer.parseInt(seatno[i])-1;
@@ -361,8 +373,9 @@ public class Student  extends Thread implements  BaseUser ,Serializable{
                
             boolean[][][] bookedSeats = event.getBookedSeats();
             if (bookedSeats[floor][row][col]) {
-                System.out.println("Error the Entered Seat number" + seatnumber+1 + "is already booked!!\nEnter unbooked seat No");
+                System.out.println("Error the Entered Seat number " + (seatnumber+1) + " is already booked!!\nEnter some unbooked Seat No...\n");
                 errorflag=true;
+               // bookTicket(event);
                 break;
             }
             else {
@@ -379,9 +392,7 @@ public class Student  extends Thread implements  BaseUser ,Serializable{
         
         
         //checked for valid avail seats
-        if(!errorflag){
-            System.out.println(normalSeats);
-            System.out.println(premiumSeats);      
+        if(!errorflag){     
             double toatlAmount= normalSeats.size()*event.getTicketPriceNormal()+event.getTicketPricePremium()* premiumSeats.size();
             Ticket ticket=Ticket.generateTicket(event,normalSeats,premiumSeats,this );
             if(ticket==null){
@@ -400,6 +411,63 @@ public class Student  extends Thread implements  BaseUser ,Serializable{
            event.registeredStudents.addStudent(this);
             return true;
         }
+        //generated ticket details
+        }
+        return false;
+
+    }
+
+    synchronized  private  boolean cancelTicket(){
+        // Displaying boooked tickets
+        this.viewRegisteredEvents();
+        System.out.println("Enter the Ticket Number which you want to cancel ");
+        Scanner sc = new Scanner(System.in);        
+       
+        int ticketNo=Integer.parseInt(sc.nextLine());
+        Ticket ticket=this.bookedTickets.get(ticketNo-1);
+        Event event = ticket.getEvent();
+        
+         ArrayList<Integer> seatno = new ArrayList();
+         seatno.addAll(ticket.getNormalseatNO());
+         seatno.addAll(ticket.getPremiumseatNO());
+        boolean errorflag=false;
+        for (int i = 0; i < seatno.size(); i++) {
+            int seatnumber = seatno.get(i);
+            seatnumber-=1;
+           // System.out.println(" Seat number " + seatno.get(i));
+            Audi audi = Audi.getAudiObj();
+            int row = seatnumber / audi.getSeatrows();
+            int col = seatnumber % audi.getSeatcolumns();
+            int floor = 0;
+            if (row>= audi.getSeatrows()) {
+                floor = 1;
+                row = (seatnumber- audi.getSeatrows()*audi.getSeatcolumns())/ audi.getSeatrows();
+            }
+               
+            boolean[][][] bookedSeats = event.getBookedSeats();
+            if (bookedSeats[floor][row][col]) {
+                System.out.println(" Seat number " + (seatnumber+1) + " getting unbooked...");               
+                bookedSeats[floor][row][col]=false;                        
+            }
+            else {
+              errorflag=true;
+              System.out.println("Error seat already unbooked");  
+            }
+        }
+        
+        
+        //checked for valid avail seats
+        if(!errorflag){
+          
+            double totalAmount=ticket.getTicketPrice();
+            bookedTickets.remove(ticket);
+            SWDCharges-=totalAmount;
+            //subtract to net event revenue
+            event.setNetRevenue(event.getNetRevenue()-totalAmount);
+            event.registeredStudents.removeStudent(this);
+             System.out.println(" Ticket canceled sucessfully for "+event.getTitle());
+            return true;
+        
         //generated ticket details
         }
         return false;
