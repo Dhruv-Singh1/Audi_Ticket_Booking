@@ -17,27 +17,21 @@ public class Admin implements BaseUser , Serializable {
     private static Admin acc;
     static final long serialVersionUID = 42L;
     //private Audi audi = Audi.getAudiObj();
-
     public String getUsername() {
         return username;
     }
-
     public void setUsername(String username) {
         this.username = username;
     }
-
     public String getPassword() {
         return password;
     }
-
     public void setPassword(String password) {
         this.password = password;
     }
-
     private Admin(String username, String password) {
             this.username= username;
             this.password=password;
-                    
     }
 
  static {
@@ -79,7 +73,8 @@ public class Admin implements BaseUser , Serializable {
                 String password = sc.next();
                 if (this.getPassword().equals(password)) {
                     System.out.println("Login Successful ");
-                    acc.adminHomePage();
+                    AdminHomePagePrinter  adminHomePagePrinter = new AdminHomePagePrinter(acc);
+                    adminHomePagePrinter.adminHomePage();
                     return true;
                 }
                 else {
@@ -94,79 +89,12 @@ public class Admin implements BaseUser , Serializable {
     }
 
 public boolean logout(){
-        String filename=  "/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/admin.ser";
-        try {
-            ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(filename));
-            //writeObject(os);
-            os.close();
-            filename=  "/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/events.ser";
-            ObjectOutputStream osEvent = new ObjectOutputStream(new FileOutputStream(filename));
-            osEvent.writeObject(Audi.getAudiObj().getEvents());
-            osEvent.close();
-        }
-        catch(FileNotFoundException e){
-            // System.out.println("");
-            e.printStackTrace();
-        }
-        catch(IOException e){
-            e.printStackTrace();
-        }
+
          System.out.println("Signing you off..");
         return true;
     }
 
 
-    public void adminHomePage(){
-       Audi.getAudiObj();
-      Scanner sc = new Scanner(System.in);
-      char ch='a';
-      while(ch!='q'){
-        System.out.println("Hii "+this.getUsername());
-        System.out.println("Enter 1. to see upcoming Event List");
-        System.out.println("Enter 2. Add Event");
-        System.out.println("Enter 3. Edit Events");
-        System.out.println("Enter 4. Reserve Seats for an Event ");
-        System.out.println("Enter 5. to update admin username password");
-        System.out.println("Enter 6. Track Revenue of a Event");
-        System.out.println("Enter 7. to Logout");       
-        int no = Integer.parseInt(sc.next());
-        switch(no){
-            case 1:
-               this.printEvents();
-                break;
-            case 2:
-               this.addEvent();
-                break;
-            case 3:
-                editEvent();     
-                break;
-            case 4:
-                Audi.getAudiObj().getEvents().get(0).printSeats();
-                
-                break;
-            case 5:
-                System.out.println("Enter the New Username");
-                String usr= sc.nextLine();
-                System.out.println("Enter the New password");
-                String pass= sc.nextLine();
-                this.setUsername(usr);
-                this.setPassword(pass);
-                break;
-            case 6:
-                this.getEventRevenue();
-                break;
-            case 7:
-                this.logout();
-                break;
-            default:
-        }
-         System.out.println("Enter q to quit any other key to continue");
-         ch=sc.next().charAt(0);
-      }
-        
-    }
-    
-    
  
     public void addEvent() {
         // take details of event input
@@ -206,8 +134,6 @@ public boolean logout(){
         int eno=Integer.parseInt(sc.nextLine());
         System.out.print(eno);
         return Audi.getAudiObj().getEvents().get(eno-1);
-    
     }
- 
 
 }

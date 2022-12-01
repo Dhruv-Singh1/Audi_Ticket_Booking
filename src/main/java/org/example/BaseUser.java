@@ -5,7 +5,7 @@ public interface BaseUser {
     //createAccount
      public  boolean login();
     // public boolean11
-
+     public boolean logout();
      default public void printEvents(){
        if(Audi.getAudiObj().getEvents()==null){
            System.out.println("Sorry!! No upcoming events yet...");

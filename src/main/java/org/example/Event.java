@@ -1,6 +1,10 @@
 package org.example;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.io.Serial;
 import java.io.Serializable;
 import java.text.ParseException;
 import org.jetbrains.annotations.NotNull;
@@ -8,7 +12,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class Event implements Comparable<Event>, Serializable {
-
     private String organizer;
     private String title;
     private String eventDetails;
@@ -21,9 +24,7 @@ public class Event implements Comparable<Event>, Serializable {
     private  double netRevenue;
     RegisteredStudents registeredStudents ;
     private int seatno []=new int[Audi.getTotalSeats()];
-    
     static final long serialVersionUID = 40L;
-
     public String geteventDuration(){
          long diff=(endTime.getTime()-startTime.getTime())/60000;
          return  diff/60+" hrs  "+ diff%60+" mins";
@@ -50,29 +51,7 @@ public class Event implements Comparable<Event>, Serializable {
     
     // is Booked on date / time ?
     // book method
-    
-    
-        public void printSeats(){
-            int i=1; char c='N';
-         for (boolean[][] flr : bookedSeats) {
-            for (boolean[] row: flr) {
-                for(boolean seat: row) {
-                    
-                    String txt= (seat)?"BookD":"Avail";
-                    if(i%Audi.getAudiObj().getSeatrows()-1 >=Audi.getAudiObj().getSeatcolumns()/3&& 
-                            i%Audi.getAudiObj().getSeatrows()-1 <= 2*Audi.getAudiObj().getSeatcolumns()/3){
-                        c='P';
-                         System.out.printf(" \033[0;1m"+c + "%03d %-6s ",i++,txt);
-                    }
-                    else{
-                        c='N';
-                    System.out.printf(" "+c + "%03d %-6s ",i++,txt);
-                    }
-                }System.out.println();
-            } System.out.println("\n\n\n"); 
-        }   System.out.println("Seat Number starting 'P' are Premium seats and 'N' are Normal seats...");
-    }
-    
+
     
     Event(){
         this.eventDetails=null;
@@ -91,80 +70,60 @@ public class Event implements Comparable<Event>, Serializable {
     public String getOrganizer() {
         return organizer;
     }
-
     public void setOrganizer(String organizer) {
         this.organizer = organizer;
     }
-
     public String getTitle() {
         return title;
     }
-
     public void setTitle(String title) {
         this.title = title;
     }
-
     public String getEventDetails() {
         return eventDetails;
     }
-
     public void setEventDetails(String eventDetails) {
         this.eventDetails = eventDetails;
     }
-
     public double getTicketPriceNormal() {
         return ticketPriceNormal;
     }
-
     public void setTicketPrice(double ticketPrice) {
         this.ticketPriceNormal = ticketPrice;
     }
       public double getTicketPricePremium() {
         return ticketPricePremium;
     }
-
     public void setTicketPricePremium(double ticketPrice) {
         this.ticketPricePremium = ticketPrice;
     }
-
     public  Date getstartTime() {
         return startTime;
     }
-
     public  Date getendTime() {
         return endTime;
     }
-
     public  void setstartTime(Date datetime) {
         this.startTime = datetime;
     }
-
     public boolean[][][] getBookedSeats() {
         return bookedSeats;
     }
-
     public void setBookedSeats(boolean[][][] bookedSeats) {
         this.bookedSeats = bookedSeats;
     }
-
     public Audi getAudi() {
         return audi;
     }
-
     public void setAudi(Audi audi) {
         this.audi = audi;
     }
-
     public int[] getSeatno() {
         return seatno;
     }
-
     public void setSeatno(int[] seatno) {
         this.seatno = seatno;
     }
-
-
-    
 
     
     Event( String title,String organizer, String eventDetails, double ticketPriceNormal,double ticketPricePremium, Date datetime,Date endtime){
@@ -198,6 +157,25 @@ public class Event implements Comparable<Event>, Serializable {
         this.netRevenue = netRevenue;
     }
 
+    
+   
+//    
+//     @Serial
+//    private void writeObject(ObjectOutputStream oos)
+//            throws IOException {
+//       
+//        oos.defaultWriteObject();
+//        // How many students we're tracking.
+//        oos.writeInt(Audi.getAudiObj().getEvents().size());
+//       
+//       for (Event event : Audi.getAudiObj().getEvents()) {
+//            oos.writeObject(event);
+//        }
+//        System.out.println("session serialized" );
+//    }
+    
+    
+    
     public static Event addEvent(){
        
         try {

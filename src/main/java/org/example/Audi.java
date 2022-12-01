@@ -2,8 +2,10 @@ package org.example;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -50,6 +52,22 @@ public class Audi implements Serializable{
               System.out.println(e);  
         }  
     };
+    
+    
+    public static void saveEvents(){
+        try{
+            String  filename=  "/Users/dhruvsingh/IdeaProjects/Audi_Ticket_Booking/resourcs/events.ser";
+            ObjectOutputStream osEven = new ObjectOutputStream(new FileOutputStream(filename));
+            osEven.writeObject(Audi.getAudiObj().getEvents());
+            osEven.close();
+            }
+        catch(FileNotFoundException e){
+             System.out.println("events.ser File Not Found!!");
+        }
+        catch(IOException e){
+            e.printStackTrace();
+        }
+    }
     
     
     public static Audi getAudiObj(){
