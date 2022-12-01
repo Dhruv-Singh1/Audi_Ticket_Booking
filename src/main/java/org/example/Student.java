@@ -208,10 +208,10 @@ public class Student  implements  BaseUser ,Serializable{
          System.out.println();
         
         }
-        System.out.print("Enter your BITS ID:   ");
-        String bitsID= sc.nextLine();
+//        System.out.print("Enter your BITS ID:   ");
+//        String bitsID= sc.nextLine();
         System.out.println("\n");
-        Student student = new Student(name,bitsID,email,password);
+        Student student = new Student(name,"",email,password);
         students.add(student);
         System.out.print("Account Created Successfully"+student);
         System.out.println("\n");
